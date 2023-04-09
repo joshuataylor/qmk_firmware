@@ -6,11 +6,16 @@
     "usb": {
         "vid": "0x3434",
         "pid": "0x0131",
-        "device_version": "1.0.0"
+        "device_version": "1.0.1"
     },
+    "matrix_pins": {
+        "cols": ["C14", "C15", "A0", "A1", "A2"],
+        "rows": ["B5", "B4", "B3", "A15", "A14", "A13"]
+    },
+    "diode_direction": "ROW2COL",
     "encoder": {
         "rotary": [
-            {"pin_a": "A3", "pin_b": "A4"}
+            {"pin_a": "A3", "pin_b": "A8"}
         ]
     },
     "bootmagic": {

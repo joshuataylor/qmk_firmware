@@ -16,6 +16,7 @@
 
 #include QMK_KEYBOARD_H
 #include "keychron_common.h"
+#include "keychron_ft_common.h"
 
 // clang-format off
 
@@ -70,15 +71,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [MAC_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
     [WIN_BASE] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU)},
-    [_FN1] = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
-    [_FN2] = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
-    [_FN3] = { ENCODER_CCW_CW(_______, _______)}
+    [_FN1]     = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
+    [_FN2]     = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)},
+    [_FN3]     = { ENCODER_CCW_CW(_______, _______)}
 };
 #endif // ENCODER_MAP_ENABLE
+
+void housekeeping_task_user(void) {
+    housekeeping_task_keychron();
+    housekeeping_task_keychron_ft();
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_record_keychron(keycode, record)) {
         return false;
     }
+
+    if (!process_record_keychron_ft(keycode, record)) {
+        return false;
+    }
+
     return true;
 }
