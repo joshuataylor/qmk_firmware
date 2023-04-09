@@ -14,12 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ansi_v1.h"
+#include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
 
 const ckled2001_led PROGMEM g_ckled2001_leds[RGB_MATRIX_LED_COUNT] = {
-/* Refer to CKLED manual for these locations
+/* Refer to CKLED2001 manual for these locations
  *   driver
  *   |  R location
  *   |  |       G location
@@ -117,7 +117,7 @@ led_config_t g_led_config = {
         1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
         8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    1,
         1,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    1,
-        1, 1, 1,          4,          1, 1, 1, 1,
+        1, 1, 1,          4,          1, 4, 4, 1,
     }
 };
 

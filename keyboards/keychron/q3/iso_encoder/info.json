@@ -6,8 +6,13 @@
     "usb": {
         "vid": "0x3434",
         "pid": "0x0123",
-        "device_version": "1.0.0"
+        "device_version": "1.0.5"
     },
+    "matrix_pins": {
+        "cols": ["C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", null, null, null, null, null, null, null, null],
+        "rows": ["B5", "B4", "B3", "A15", "A14", "A13"]
+    },
+    "diode_direction": "ROW2COL",
     "encoder": {
         "rotary": [
             {"pin_a": "A10", "pin_b": "A8"}
@@ -32,9 +37,9 @@
                 {"matrix":[0,11], "x":11.75, "y":0},
                 {"matrix":[0,12], "x":12.75, "y":0},
                 {"matrix":[0,13], "x":14, "y":0},
-                {"matrix":[0,14], "x":15.25, "y":0},
-                {"matrix":[0,15], "x":16.25, "y":0},
-                {"matrix":[3,14], "x":17.25, "y":0},
+                {"matrix":[0,14], "x":15.75, "y":0},
+                {"matrix":[0,15], "x":16.75, "y":0},
+                {"matrix":[3,14], "x":17.75, "y":0},
 
                 {"matrix":[1, 0], "x":0, "y":1.25},
                 {"matrix":[1, 1], "x":1, "y":1.25},

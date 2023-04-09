@@ -16,6 +16,7 @@
 
 #include QMK_KEYBOARD_H
 #include "keychron_common.h"
+#include "keychron_ft_common.h"
 
 // clang-format off
 
@@ -73,9 +74,19 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
 
 // clang-format on
 
+void housekeeping_task_user(void) {
+    housekeeping_task_keychron();
+    housekeeping_task_keychron_ft();
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_record_keychron(keycode, record)) {
         return false;
     }
+
+    if (!process_record_keychron_ft(keycode, record)) {
+        return false;
+    }
+
     return true;
 }
