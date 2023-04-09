@@ -1,22 +1,9 @@
-/* Copyright 2022 @ Keychron (https://www.keychron.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include QMK_KEYBOARD_H
 #include "keychron_common.h"
 #include "keychron_ft_common.h"
+
+#pragma GCC push_options
+#pragma GCC optimize("-Ofast")
 
 // clang-format off
 
@@ -81,6 +68,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (!process_record_keychron_ft(keycode, record)) {
         return false;
+    }
+
+    switch (keycode) {
+        case KC_CAPS:
+            if (record->event.pressed) {
+                if (rgblight_is_enabled()) {
+                    rgblight_disable_noeeprom();
+                } else {
+                    rgblight_sethsv_noeeprom(0, 0, 255);
+                    rgblight_enable_noeeprom();
+                }
+            }
+            return false; // Skip the default caps lock handling
+        case KC_RCTL:
+            if (record->event.pressed) {
+                tap_code(KC_F12);
+            }
+            return false; // Skip the default right control handling
+        default:
+            return true; // Process all other keycodes as usual
     }
 
     return true;
