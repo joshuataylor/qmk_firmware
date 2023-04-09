@@ -1,4 +1,4 @@
-/* Copyright 2021 @ Keychron (https://www.keychron.com)
+/* Copyright 2022 @ Keychron (https://www.keychron.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,12 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ansi_encoder.h"
+#include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
 
 const ckled2001_led PROGMEM g_ckled2001_leds[RGB_MATRIX_LED_COUNT] = {
-/* Refer to IS31 manual for these locations
+/* Refer to CKLED2001 manual for these locations
  *   driver
  *   |  R location
  *   |  |       G location
@@ -38,6 +38,7 @@ const ckled2001_led PROGMEM g_ckled2001_leds[RGB_MATRIX_LED_COUNT] = {
     {0, I_11,   G_11,   H_11},
     {0, I_12,   G_12,   H_12},
     {0, I_13,   G_13,   H_13},
+    // {0, I_14,   G_14,   H_14}, // Encoder
     {0, I_15,   G_15,   H_15},
     {0, I_16,   G_16,   H_16},
     {1, I_15,   G_15,   H_15},
@@ -143,12 +144,51 @@ led_config_t g_led_config = {
     {
         // RGB LED Index to Flag
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,    1, 1, 1,
-        1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1,
+        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1,
         1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1,
         8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    1,
         1,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    1,    1,
-        1, 1, 1,          4,          1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1,          4,          1, 1, 4, 1, 1, 1, 1,
     }
 };
 
-#endif // RGB_MATRIX_ENABLE
+#endif
+
+#if defined(ENCODER_ENABLE) && defined(PAL_USE_CALLBACKS)
+
+void encoder0_pad_cb(void *param) {
+    (void)param;
+
+    encoder_inerrupt_read(0);
+}
+
+void encoder1_pad_cb(void *param) {
+    (void)param;
+
+    encoder_inerrupt_read(1);
+}
+
+void encoder_interrupt_init(void) {
+    pin_t encoders_pad_a[NUM_ENCODERS] = ENCODERS_PAD_A;
+    pin_t encoders_pad_b[NUM_ENCODERS] = ENCODERS_PAD_B;
+    for (uint8_t i = 0; i < NUM_ENCODERS; i++) {
+        palEnableLineEvent(encoders_pad_a[i], PAL_EVENT_MODE_BOTH_EDGES);
+        palEnableLineEvent(encoders_pad_b[i], PAL_EVENT_MODE_BOTH_EDGES);
+    }
+    if (NUM_ENCODERS > 0) {
+        palSetLineCallback(encoders_pad_a[0], encoder0_pad_cb, NULL);
+        palSetLineCallback(encoders_pad_b[0], encoder0_pad_cb, NULL);
+    }
+    if (NUM_ENCODERS > 1) {
+        palSetLineCallback(encoders_pad_a[1], encoder1_pad_cb, NULL);
+        palSetLineCallback(encoders_pad_b[1], encoder1_pad_cb, NULL);
+    }
+}
+
+void keyboard_post_init_kb(void) {
+    encoder_interrupt_init();
+    // allow user keymaps to do custom post_init
+    keyboard_post_init_user();
+}
+
+#endif

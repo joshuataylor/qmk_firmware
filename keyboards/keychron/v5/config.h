@@ -16,15 +16,6 @@
 
 #pragma once
 
-/* Key matrix pins */
-#define MATRIX_ROW_PINS \
-    { B5, B4, B3, A15, A14, A13 }
-#define MATRIX_COL_PINS \
-    { A10, A9, A8, B1, B0, A7, A6, A5, A4, A3, NO_PIN, NO_PIN, NO_PIN, NO_PIN, NO_PIN, NO_PIN, NO_PIN, NO_PIN }
-
-/* COL2ROW or ROW2COL */
-#define DIODE_DIRECTION ROW2COL
-
 /* RGB Matrix Driver Configuration */
 #define DRIVER_COUNT 2
 #define DRIVER_ADDR_1 0b1110111
@@ -38,10 +29,14 @@
 #define I2C1_TIMINGR_SCLL 51U
 
 #define CKLED2001_CURRENT_TUNE \
-    { 0xB6, 0xB6, 0x56, 0xB6, 0xB6, 0x56, 0xB6, 0xB6, 0x56, 0xB6, 0xB6, 0x56 }
+    { 0xB0, 0xB0, 0x56, 0xB0, 0xB0, 0x56, 0xB0, 0xB0, 0x56, 0xB0, 0xB0, 0x56 }
 
 /* DIP switch */
-#define DIP_SWITCH_MATRIX_GRID  { {5, 4} }
+#define DIP_SWITCH_MATRIX_GRID \
+    {                          \
+        { 5, 4 }               \
+    }
+#define SCAN_COUNT_MAX 100
 
 /* Disable DIP switch in matrix data */
 #define MATRIX_MASKED
@@ -85,9 +80,13 @@
 #define ENABLE_RGB_MATRIX_PIXEL_RAIN
 // #define ENABLE_RGB_MATRIX_PIXEL_FLOW
 // #define ENABLE_RGB_MATRIX_PIXEL_FRACTAL
+
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 // enabled only if RGB_MATRIX_FRAMEBUFFER_EFFECTS is defined
 #define ENABLE_RGB_MATRIX_TYPING_HEATMAP
 #define ENABLE_RGB_MATRIX_DIGITAL_RAIN
+
+#define RGB_MATRIX_KEYPRESSES
 // enabled only of RGB_MATRIX_KEYPRESSES or RGB_MATRIX_KEYRELEASES is defined
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
 // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE
@@ -102,5 +101,6 @@
 #define ENABLE_RGB_MATRIX_SOLID_SPLASH
 // #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
-#define RGB_MATRIX_KEYPRESSES
+/* Factory test keys */
+#define FN_KEY1 MO(1)
+#define FN_KEY2 MO(3)

@@ -1,4 +1,4 @@
-/* Copyright 2022 @ Keychron (https://www.keychron.com)
+/* Copyright 2023 @ Keychron (https://www.keychron.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "matrix.h"
 #include "quantum.h"
 
-#ifndef PIN_USED_74HC595
-#    define PIN_USED_74HC595 8
-#endif
-#ifndef PIN_START_74HC595
-#    define PIN_START_74HC595 8
-#endif
+#define HC595_STCP B0
+#define HC595_SHCP B1
+#define HC595_DS A7
 
-#ifdef MATRIX_ROW_PINS
-static pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
-#endif // MATRIX_ROW_PINS
-#ifdef MATRIX_COL_PINS
-static pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
-#endif // MATRIX_COL_PINS
+pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
+pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 
 #define ROWS_PER_HAND (MATRIX_ROWS)
 
@@ -61,42 +53,44 @@ static inline uint8_t readMatrixPin(pin_t pin) {
     }
 }
 
-void small_delay(volatile uint8_t timeout) {
-    while (timeout--);
+static inline void HC595_delay(uint16_t n) {
+    while (n-- > 0) {
+        asm volatile("nop" ::: "memory");
+    };
 }
 
-static void shiftOut(uint16_t dataOut) {
+static void HC595_output(uint8_t data) {
     ATOMIC_BLOCK_FORCEON {
-        for (uint8_t i = 0; i < PIN_USED_74HC595; i++) {
-            if (dataOut & 0x1) {
-                writePinHigh(DATA_PIN_74HC595);
+        for (uint8_t i = 0; i < 8; i++) {
+            if (data & 0x1) {
+                writePinHigh(HC595_DS);
             } else {
-                writePinLow(DATA_PIN_74HC595);
+                writePinLow(HC595_DS);
             }
-            dataOut = dataOut >> 1;
-            writePinHigh(CLOCK_PIN_74HC595);
-            small_delay(2);
-            writePinLow(CLOCK_PIN_74HC595);
+            data = data >> 1;
+            writePinHigh(HC595_SHCP);
+            HC595_delay(3);
+            writePinLow(HC595_SHCP);
         }
-        writePinHigh(LATCH_PIN_74HC595);
-        small_delay(2);
-        writePinLow(LATCH_PIN_74HC595);
+        writePinHigh(HC595_STCP);
+        HC595_delay(3);
+        writePinLow(HC595_STCP);
     }
 }
 
-static void shiftOut_single(uint8_t data) {
+static void HC595_output_bit(uint8_t data) {
     ATOMIC_BLOCK_FORCEON {
         if (data & 0x1) {
-            writePinHigh(DATA_PIN_74HC595);
+            writePinHigh(HC595_DS);
         } else {
-            writePinLow(DATA_PIN_74HC595);
+            writePinLow(HC595_DS);
         }
-        writePinHigh(CLOCK_PIN_74HC595);
-        small_delay(2);
-        writePinLow(CLOCK_PIN_74HC595);
-        writePinHigh(LATCH_PIN_74HC595);
-        small_delay(2);
-        writePinLow(LATCH_PIN_74HC595);
+        writePinHigh(HC595_SHCP);
+        HC595_delay(3);
+        writePinLow(HC595_SHCP);
+        writePinHigh(HC595_STCP);
+        HC595_delay(3);
+        writePinLow(HC595_STCP);
     }
 }
 
@@ -107,8 +101,8 @@ static bool select_col(uint8_t col) {
         setPinOutput_writeLow(pin);
         return true;
     } else {
-        if (col == PIN_START_74HC595) {
-            shiftOut_single(0x00);
+        if (col == 8) {
+            HC595_output_bit(0x00);
         }
         return true;
     }
@@ -125,7 +119,7 @@ static void unselect_col(uint8_t col) {
         setPinInputHigh_atomic(pin);
 #endif
     } else {
-        shiftOut_single(0x01);
+        HC595_output_bit(0x01);
     }
 }
 
@@ -141,16 +135,15 @@ static void unselect_cols(void) {
             setPinInputHigh_atomic(pin);
 #endif
         }
-        if (x == PIN_START_74HC595)
-            // unselect Shift Register
-            shiftOut(0xFFFF);
+        if (x == 8)
+            HC595_output(0xFF);
     }
 }
 
 static void matrix_init_pins(void) {
-    setPinOutput(DATA_PIN_74HC595);
-    setPinOutput(CLOCK_PIN_74HC595);
-    setPinOutput(LATCH_PIN_74HC595);
+    setPinOutput(HC595_DS);
+    setPinOutput(HC595_SHCP);
+    setPinOutput(HC595_STCP);
 #ifdef MATRIX_UNSELECT_DRIVE_HIGH
     for (uint8_t x = 0; x < MATRIX_COLS; x++) {
         if (col_pins[x] != NO_PIN) {

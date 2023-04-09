@@ -1,4 +1,4 @@
-/* Copyright 2021 @ Keychron (https://www.keychron.com)
+/* Copyright 2022 @ Keychron (https://www.keychron.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,6 @@
  */
 
 #pragma once
-
-/* COL2ROW or ROW2COL */
-#define DIODE_DIRECTION ROW2COL
-
-/* key matrix pins */
-#define MATRIX_ROW_PINS \
-    { B4, B3, A15, A14, A13 }
-#define MATRIX_COL_PINS \
-    { C14, C15, A0, A1, A2, A3, A4, A5, A6, A7, B0, B1, A8, A9, H3 }
 
 /* If uses PH3 with a stronger pull resistor then the following definition should be included */
 // #define MATRIX_UNSELECT_DRIVE_HIGH
@@ -47,12 +38,14 @@
 #define MATRIX_MASKED
 
 /* DIP switch */
-#define DIP_SWITCH_MATRIX_GRID  { {4,4} }
+#define DIP_SWITCH_MATRIX_GRID \
+    {                          \
+        { 4, 4 }               \
+    }
+#define SCAN_COUNT_MAX 100
 
 /* turn off effects when suspended */
 #define RGB_DISABLE_WHEN_USB_SUSPENDED
-
-#define DYNAMIC_KEYMAP_LAYER_COUNT 5
 
 /* EEPROM Driver Configuration */
 #define WEAR_LEVELING_LOGICAL_SIZE 2048
@@ -90,9 +83,13 @@
 #define ENABLE_RGB_MATRIX_PIXEL_RAIN
 // #define ENABLE_RGB_MATRIX_PIXEL_FLOW
 // #define ENABLE_RGB_MATRIX_PIXEL_FRACTAL
+
+#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 // enabled only if RGB_MATRIX_FRAMEBUFFER_EFFECTS is defined
 #define ENABLE_RGB_MATRIX_TYPING_HEATMAP
 #define ENABLE_RGB_MATRIX_DIGITAL_RAIN
+
+#define RGB_MATRIX_KEYPRESSES
 // enabled only of RGB_MATRIX_KEYPRESSES or RGB_MATRIX_KEYRELEASES is defined
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
 // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE
@@ -107,5 +104,6 @@
 #define ENABLE_RGB_MATRIX_SOLID_SPLASH
 // #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 
-#define RGB_MATRIX_KEYPRESSES
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+/* Factory test keys */
+#define FN_KEY1 MO(2)
+#define FN_KEY2 MO(3)

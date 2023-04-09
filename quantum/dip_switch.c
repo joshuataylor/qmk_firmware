@@ -39,6 +39,10 @@
 static pin_t dip_switch_pad[] = DIP_SWITCH_PINS;
 #endif
 
+#ifndef SCAN_COUNT_MAX
+#    define SCAN_COUNT_MAX 500
+#endif
+
 #ifdef DIP_SWITCH_MATRIX_GRID
 typedef struct matrix_index_t {
     uint8_t row;
@@ -95,9 +99,12 @@ void dip_switch_read(bool forced) {
     uint32_t dip_switch_mask       = 0;
 
 #ifdef DIP_SWITCH_MATRIX_GRID
+#    ifndef SCAN_COUNT_MAX
+#        define SCAN_COUNT_MAX 500
+#    endif
     bool read_raw = false;
 
-    if (scan_count < 500) {
+    if (scan_count < SCAN_COUNT_MAX) {
         scan_count++;
         if (scan_count == 10) {
             read_raw = true;
