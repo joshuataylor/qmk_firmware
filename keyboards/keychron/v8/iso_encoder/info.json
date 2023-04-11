@@ -6,11 +6,30 @@
     "usb": {
         "vid": "0x3434",
         "pid": "0x0383",
-        "device_version": "1.0.0"
+        "device_version": "1.0.2"
     },
+    "features": {
+        "bootmagic": true,
+        "command": false,
+        "console": false,
+        "dip_switch": true,
+        "encoder": true,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true,
+        "rgb_matrix": true
+    },
+    "rgb_matrix": {
+        "driver": "CKLED2001"
+    },
+    "matrix_pins": {
+        "cols": ["C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "A8", "A9", "H3"],
+        "rows": ["B4", "B3", "A15", "A14", "A13"]
+    },
+    "diode_direction": "ROW2COL",
     "encoder": {
         "rotary": [
-            {"pin_a": "A10", "pin_b": "B5"}
+            {"pin_a": "B5", "pin_b": "A10"}
         ]
     },
     "processor": "STM32L432",
@@ -55,12 +74,12 @@
                 {"matrix":[2, 3], "x":4.5, "y":2.25},
                 {"matrix":[2, 4], "x":5.5, "y":2.25},
                 {"matrix":[2, 5], "x":6.5, "y":2.25},
-                {"matrix":[2, 6], "x":9.25, "y":2.25},
-                {"matrix":[2, 7], "x":10.25, "y":2.25},
-                {"matrix":[2, 8], "x":11.25, "y":2.25},
-                {"matrix":[2, 9], "x":12.25, "y":2.25},
-                {"matrix":[2,10], "x":13.5, "y":2.25},
-                {"matrix":[2,11], "x":14.5, "y":2.25},
+                {"matrix":[2, 7], "x":9.25, "y":2.25},
+                {"matrix":[2, 8], "x":10.25, "y":2.25},
+                {"matrix":[2, 9], "x":11.25, "y":2.25},
+                {"matrix":[2,10], "x":12.25, "y":2.25},
+                {"matrix":[2,11], "x":13.5, "y":2.25},
+                {"matrix":[2,12], "x":14.5, "y":2.25},
                 {"matrix":[2,13], "x":15.5, "y":2.25},
                 {"matrix":[1,13], "x":16.5, "y":1.25, "w":1.25, "h":2},
                 {"matrix":[2,14], "x":18.5, "y":2.5},

@@ -1,4 +1,4 @@
-/* Copyright 2023 @ Keychron (https://www.keychron.com)
+/* Copyright 2022 @ Keychron (https://www.keychron.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,13 @@
  */
 
 #include "quantum.h"
+#include "keychron_common.h"
 
 // Mask out handedness diode to prevent it
 // from keeping the keyboard awake
 // - just mirroring `KC_NO` in the `LAYOUT`
 //   macro to keep it simple
+// clang-format off
 const matrix_row_t matrix_mask[] = {
     0b011111111,
     0b011111111,
@@ -47,56 +49,59 @@ bool dip_switch_update_kb(uint8_t index, bool active) {
 }
 #endif
 
-#if defined(RGB_MATRIX_ENABLE) && (defined(CAPS_LOCK_LED_INDEX) || defined(NUM_LOCK_LED_INDEX))
-bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    if (!process_record_user(keycode, record)) {
-        return false;
+#define ADC_BUFFER_DEPTH 1
+#define ADC_NUM_CHANNELS 1
+#define ADC_SAMPLING_RATE ADC_SMPR_SMP_12P5
+#define ADC_RESOLUTION ADC_CFGR_RES_10BITS
+
+static int16_t analogReadPin_my(pin_t pin) {
+    ADCConfig          adcCfg = {};
+    adcsample_t        sampleBuffer[ADC_NUM_CHANNELS * ADC_BUFFER_DEPTH];
+    ADCDriver         *targetDriver       = &ADCD1;
+    ADCConversionGroup adcConversionGroup = {
+        .circular     = FALSE,
+        .num_channels = (uint16_t)(ADC_NUM_CHANNELS),
+        .cfgr         = ADC_RESOLUTION,
+    };
+
+    palSetLineMode(pin, PAL_MODE_INPUT_ANALOG);
+    switch (pin) {
+        case B0:
+            adcConversionGroup.smpr[2] = ADC_SMPR2_SMP_AN15(ADC_SAMPLING_RATE);
+            adcConversionGroup.sqr[0]  = ADC_SQR1_SQ1_N(ADC_CHANNEL_IN15);
+            sampleBuffer[0]            = 0;
+            break;
+        case B1:
+            adcConversionGroup.smpr[2] = ADC_SMPR2_SMP_AN16(ADC_SAMPLING_RATE);
+            adcConversionGroup.sqr[0]  = ADC_SQR1_SQ1_N(ADC_CHANNEL_IN16);
+            sampleBuffer[0]            = 0;
+            break;
+        default:
+            return 0;
     }
-    switch (keycode) {
-        case RGB_TOG:
-            if (record->event.pressed) {
-                switch (rgb_matrix_get_flags()) {
-                    case LED_FLAG_ALL: {
-                        rgb_matrix_set_flags(LED_FLAG_NONE);
-                        rgb_matrix_set_color_all(0, 0, 0);
-                    } break;
-                    default: {
-                        rgb_matrix_set_flags(LED_FLAG_ALL);
-                    } break;
-                }
-            }
-            if (!rgb_matrix_is_enabled()) {
-                rgb_matrix_set_flags(LED_FLAG_ALL);
-                rgb_matrix_enable();
-            }
-            return false;
+    adcStart(targetDriver, &adcCfg);
+    if (adcConvert(targetDriver, &adcConversionGroup, &sampleBuffer[0], ADC_BUFFER_DEPTH) != MSG_OK) {
+        return 0;
     }
-    return true;
+
+    return *sampleBuffer;
 }
 
-bool rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max) {
-    if (!rgb_matrix_indicators_advanced_user(led_min, led_max)) {
-        return false;
-    }
-    // RGB_MATRIX_INDICATOR_SET_COLOR(index, red, green, blue);
-#    if defined(CAPS_LOCK_LED_INDEX)
-    if (host_keyboard_led_state().caps_lock) {
-        RGB_MATRIX_INDICATOR_SET_COLOR(CAPS_LOCK_LED_INDEX, 255, 255, 255);
-    } else {
-        if (!rgb_matrix_get_flags()) {
-            RGB_MATRIX_INDICATOR_SET_COLOR(CAPS_LOCK_LED_INDEX, 0, 0, 0);
-        }
-    }
-#    endif // CAPS_LOCK_LED_INDEX
-#    if defined(NUM_LOCK_LED_INDEX)
-    if (host_keyboard_led_state().num_lock) {
-        RGB_MATRIX_INDICATOR_SET_COLOR(NUM_LOCK_LED_INDEX, 255, 255, 255);
-    } else {
-        if (!rgb_matrix_get_flags()) {
-            RGB_MATRIX_INDICATOR_SET_COLOR(NUM_LOCK_LED_INDEX, 0, 0, 0);
-        }
-    }
-#    endif // NUM_LOCK_LED_INDEX
-    return true;
-}
+void keyboard_post_init_kb(void) {
+#if defined(ENCODER_ENABLE) && defined(PAL_USE_CALLBACKS)
+    keyboard_post_init_keychron();
 #endif
+
+    if (is_keyboard_left()) {
+        setPinOutput(A0);
+        writePinHigh(A0);
+    } else {
+        if ((analogReadPin_my(B0) > 1000) || (analogReadPin_my(B1) > 1000)) {
+            setPinInput(A11);
+            setPinInput(A12);
+        }
+    }
+
+    // allow user keymaps to do custom post_init
+    keyboard_post_init_user();
+}

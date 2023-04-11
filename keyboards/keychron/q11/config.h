@@ -1,4 +1,4 @@
-/* Copyright 2023 @ Keychron(https://www.keychron.com)
+/* Copyright 2022 @ Keychron(https://www.keychron.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
 
 #pragma once
 
+/* Set 0 if debouncing isn't needed */
+#define DEBOUNCE 5
+
 // Connects each switch in the dip switch to the GPIO pin of the MCU
 #define DIP_SWITCH_PINS \
     { A8 }
@@ -23,8 +26,12 @@
 /* handedness */
 #define SPLIT_HAND_MATRIX_GRID A2, A15
 #define SPLIT_HAND_MATRIX_GRID_LOW_IS_RIGHT
-
 #define MATRIX_MASKED // actual mask is defined by `matrix_mask` in `q11.c`
+// #define SPLIT_WATCHDOG_ENABLE
+// #define EE_HANDS
+// #define MASTER_LEFT
+// #define SPLIT_USB_TIMEOUT 2000
+// #define NO_USB_STARTUP_CHECK
 
 /* RGB Matrix Configuration */
 #define DRIVER_COUNT 1
@@ -40,6 +47,7 @@
 #define I2C1_TIMINGR_SCLH 15U
 #define I2C1_TIMINGR_SCLL 51U
 
+/* Set LED driver current */
 #define CKLED2001_CURRENT_TUNE \
     { 0x80, 0xFF, 0xFF, 0x80, 0xFF, 0xFF, 0x80, 0xFF, 0xFF, 0x80, 0xFF, 0xFF } // 300mA
 
@@ -49,6 +57,8 @@
 
 /* Split Keyboard specific options. */
 #define SERIAL_USART_TX_PIN A9 // USART TX pin
+// #define SERIAL_USART_FULL_DUPLEX // Enable full duplex operation mode.
+// #define SERIAL_USART_RX_PIN A10  // USART RX pin
 
 /* Encoder Configuration */
 #define ENCODER_DEFAULT_POS 0x3
@@ -108,3 +118,7 @@
 // #define ENABLE_RGB_MATRIX_MULTISPLASH
 #define ENABLE_RGB_MATRIX_SOLID_SPLASH
 // #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
+
+/* Factory test keys */
+#define FN_KEY1 MO(1)
+#define FN_KEY2 MO(3)
